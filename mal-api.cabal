@@ -1,0 +1,81 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.34.1.
+--
+-- see: https://github.com/sol/hpack
+
+name:           mal-api
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/emekoi/mal-api#readme>
+homepage:       https://github.com/emekoi/mal-api#readme
+bug-reports:    https://github.com/emekoi/mal-api/issues
+author:         Emeka Nkurumeh
+maintainer:     emekankurumeh@outlook.com
+copyright:      MIT
+license:        MIT
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/emekoi/mal-api
+
+library
+  exposed-modules:
+      Network.API.MAL.Internals.Types
+  other-modules:
+      Paths_mal_api
+  hs-source-dirs:
+      src
+  default-extensions: OverloadedStrings LambdaCase
+  ghc-options: -pgml clang -optc-pipe
+  ld-options: -fuse-ld=lld
+  build-depends:
+      aeson >=1.4.7.1
+    , base >=4.7 && <5
+    , bytestring >=0.10.10
+    , req >=3.2.0
+    , text >=1.2.4.0
+    , time >=1.1.0
+  default-language: Haskell2010
+
+executable mal
+  main-is: Main.hs
+  other-modules:
+      Paths_mal_api
+  hs-source-dirs:
+      app
+  default-extensions: OverloadedStrings LambdaCase
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -pgml clang -optc-pipe
+  ld-options: -fuse-ld=lld
+  build-depends:
+      aeson >=1.4.7.1
+    , base >=4.7 && <5
+    , bytestring >=0.10.10
+    , mal-api
+    , req >=3.2.0
+    , text >=1.2.4.0
+    , time >=1.1.0
+  default-language: Haskell2010
+
+test-suite mal-api-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_mal_api
+  hs-source-dirs:
+      test
+  default-extensions: OverloadedStrings LambdaCase
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson >=1.4.7.1
+    , base >=4.7 && <5
+    , bytestring >=0.10.10
+    , mal-api
+    , req >=3.2.0
+    , text >=1.2.4.0
+    , time >=1.1.0
+  default-language: Haskell2010

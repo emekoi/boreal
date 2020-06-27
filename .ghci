@@ -1,0 +1,7 @@
+:unset +s +t
+:set +m -v0
+:seti -w -XOverloadedStrings
+:set editor micro
+:def! rr \_ -> return ":script .ghci"
+:set prompt "❯ "
+:set +t
