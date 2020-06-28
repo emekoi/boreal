@@ -4,11 +4,11 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 
-name:           mal-api
+name:           boreal
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/emekoi/mal-api#readme>
-homepage:       https://github.com/emekoi/mal-api#readme
-bug-reports:    https://github.com/emekoi/mal-api/issues
+description:    Please see the README on GitHub at <https://github.com/emekoi/boreal#readme>
+homepage:       https://github.com/emekoi/boreal#readme
+bug-reports:    https://github.com/emekoi/boreal/issues
 author:         Emeka Nkurumeh
 maintainer:     emekankurumeh@outlook.com
 copyright:      MIT
@@ -21,14 +21,14 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/emekoi/mal-api
+  location: https://github.com/emekoi/boreal
 
 library
   exposed-modules:
       Network.API.MAL
       Network.API.MAL.Types
   other-modules:
-      Paths_mal_api
+      Paths_boreal
   hs-source-dirs:
       src
   default-extensions: OverloadedStrings LambdaCase DuplicateRecordFields
@@ -39,16 +39,18 @@ library
     , aeson-pretty >=0.8.8
     , base >=4.7 && <5
     , bytestring >=0.10.10
+    , directory >=1.3.6.0
+    , optparse-applicative >=0.15.1.0
     , req >=3.2.0
     , text >=1.2.4.0
     , text-manipulate >=0.2.0.1
     , time >=1.1.0
   default-language: Haskell2010
 
-executable mal
+executable boreal
   main-is: Main.hs
   other-modules:
-      Paths_mal_api
+      Paths_boreal
   hs-source-dirs:
       app
   default-extensions: OverloadedStrings LambdaCase DuplicateRecordFields
@@ -58,19 +60,21 @@ executable mal
       aeson >=1.4.7.1
     , aeson-pretty >=0.8.8
     , base >=4.7 && <5
+    , boreal
     , bytestring >=0.10.10
-    , mal-api
+    , directory >=1.3.6.0
+    , optparse-applicative >=0.15.1.0
     , req >=3.2.0
     , text >=1.2.4.0
     , text-manipulate >=0.2.0.1
     , time >=1.1.0
   default-language: Haskell2010
 
-test-suite mal-api-test
+test-suite boreal-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Paths_mal_api
+      Paths_boreal
   hs-source-dirs:
       test
   default-extensions: OverloadedStrings LambdaCase DuplicateRecordFields
@@ -79,8 +83,10 @@ test-suite mal-api-test
       aeson >=1.4.7.1
     , aeson-pretty >=0.8.8
     , base >=4.7 && <5
+    , boreal
     , bytestring >=0.10.10
-    , mal-api
+    , directory >=1.3.6.0
+    , optparse-applicative >=0.15.1.0
     , req >=3.2.0
     , text >=1.2.4.0
     , text-manipulate >=0.2.0.1

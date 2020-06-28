@@ -5,6 +5,7 @@ module Network.API.MAL
   ( userAuthenticate,
     userReAuthenticate,
     userInfo,
+    searchAnime,
   )
 where
 
@@ -114,4 +115,18 @@ userInfo AuthToken {..} Nothing = do
       jsonResponse
       (baseHeaders <> oAuth2Bearer (encodeUtf8 access_token))
   let (Success b) = fromJSON (responseBody r :: Value)
+  return b
+
+searchAnime :: MonadIO m => Text -> m [Anime]
+searchAnime title = do
+  r <- runReq defaultHttpConfig $ do
+    req
+      GET
+      (endpointV2 /: "anime")
+      NoReqBody
+      jsonResponse
+      (baseHeaders <> "q" =: title)
+  let response = responseBody r :: Value
+  liftIO $ print response
+  let (Success b) = fromJSON response
   return b
