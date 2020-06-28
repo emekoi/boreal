@@ -22,14 +22,17 @@ description:         Please see the README on GitHub at <https://github.com/emek
 dependencies:
 - base >= 4.7 && < 5
 - text >= 1.2.4.0
+- text-manipulate >= 0.2.0.1
 - time >= 1.1.0
 - req >= 3.2.0
 - aeson >= 1.4.7.1
+- aeson-pretty >= 0.8.8
 - bytestring >= 0.10.10
 
 default-extensions:
   - OverloadedStrings
   - LambdaCase
+  - DuplicateRecordFields
 
 library:
   source-dirs: src

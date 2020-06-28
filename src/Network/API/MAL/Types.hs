@@ -1,8 +1,6 @@
-{-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-module Network.API.MAL.Internals.Types where
+module Network.API.MAL.Types where
 
 import Control.Applicative ((<|>))
 import Data.Aeson
@@ -14,7 +12,7 @@ import Data.Maybe (fromMaybe)
 import qualified Data.Text as T
 import Data.Text (Text)
 import Data.Time (Day, DayOfWeek, ZonedTime)
-import Data.Time.Format.ISO8601 (Format (..), FormatExtension (..), ISO8601 (..), iso8601ParseM, iso8601Show, zonedTimeFormat)
+import Data.Time.Format.ISO8601 (iso8601ParseM, iso8601Show)
 
 data Broadcast
   = Broadcast -- the broadcasting schedule of the anime
@@ -23,7 +21,11 @@ data Broadcast
       }
   deriving (Show)
 
-deriveJSON defaultOptions {constructorTagModifier = map toLower} ''Broadcast
+deriveJSON
+  defaultOptions
+    { constructorTagModifier = map toLower
+    }
+  ''Broadcast
 
 data Date
   = ZonedTime ZonedTime -- an iso8601 formatted time string
@@ -54,7 +56,11 @@ data SortingMethod
   | AnimeStartDate
   deriving (Show)
 
-deriveJSON defaultOptions {constructorTagModifier = map toLower} ''SortingMethod
+deriveJSON
+  defaultOptions
+    { constructorTagModifier = map toLower
+    }
+  ''SortingMethod
 
 data Season
   = Winter -- a season in a year
@@ -63,7 +69,11 @@ data Season
   | Fall
   deriving (Show)
 
-deriveJSON defaultOptions {constructorTagModifier = map toLower} ''Season
+deriveJSON
+  defaultOptions
+    { constructorTagModifier = map toLower
+    }
+  ''Season
 
 data AnimeSeason
   = AnimeSeason -- a specific anime season
@@ -82,7 +92,11 @@ data AnimeStatus
   | PlanToWatch
   deriving (Show)
 
-deriveJSON defaultOptions {constructorTagModifier = map toLower} ''AnimeStatus
+deriveJSON
+  defaultOptions
+    { constructorTagModifier = map toLower
+    }
+  ''AnimeStatus
 
 data AlternativeTitles
   = AlternativeTitles -- a set of titles and synonyms of the anime
@@ -130,7 +144,7 @@ data Anime
         popularity :: Int, -- the popularity rankings of this anime
         rank :: Int, -- the rankings of this anime
         start_date :: Date, -- the date at which the anime started
-        start_season :: Season, -- the season at which the anime started broadcasting
+        start_season :: AnimeSeason, -- the season at which the anime started broadcasting
         status :: Text, -- an enumeration representing the broadcasting status of the anime (e.g. finished_airing)
         synopsis :: Text, -- the synopsis of the anime
         title :: Text, -- the canonical (?) title of the anime
@@ -141,7 +155,11 @@ data Anime
       }
   deriving (Show)
 
-deriveJSON defaultOptions {fieldLabelModifier = \v -> fromMaybe v $ stripPrefix "anime_" v} ''Anime
+deriveJSON
+  defaultOptions
+    { fieldLabelModifier = \v -> fromMaybe v $ stripPrefix "anime_" v
+    }
+  ''Anime
 
 instance Eq Anime where
   a == b = on (==) anime_id a b
@@ -158,4 +176,28 @@ data User
 instance Eq User where
   a == b = on (==) user_id a b
 
-deriveJSON defaultOptions {fieldLabelModifier = \v -> fromMaybe v $ stripPrefix "user_" v} ''User
+deriveJSON
+  defaultOptions
+    { fieldLabelModifier = \v -> fromMaybe v $ stripPrefix "user_" v
+    }
+  ''User
+
+data AuthToken
+  = AuthToken
+      { expires_in :: Int,
+        access_token :: Text,
+        refresh_token :: Text
+      }
+  | InvalidToken
+      { _error :: Text,
+        message :: Text,
+        hint :: Maybe Text
+      }
+  deriving (Show)
+
+deriveJSON
+  defaultOptions
+    { fieldLabelModifier = \v -> fromMaybe v $ stripPrefix "_" v,
+      sumEncoding = UntaggedValue
+    }
+  ''AuthToken
