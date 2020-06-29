@@ -33,8 +33,10 @@ dependencies:
 
 default-extensions:
   - OverloadedStrings
+  - DataKinds
   - LambdaCase
   - DuplicateRecordFields
+  - RecordWildCards
 
 library:
   source-dirs: src
@@ -45,7 +47,7 @@ library:
 
 executables:
   boreal:
-    main:                Main.hs
+    main:                Boreal.hs
     source-dirs:         app
     ghc-options:
     - -threaded

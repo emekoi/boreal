@@ -25,13 +25,16 @@ source-repository head
 
 library
   exposed-modules:
-      Network.API.MAL
+      Network.API.MAL.Anime
+      Network.API.MAL.Auth
+      Network.API.MAL.Constants
       Network.API.MAL.Types
+      Network.API.MAL.User
   other-modules:
       Paths_boreal
   hs-source-dirs:
       src
-  default-extensions: OverloadedStrings LambdaCase DuplicateRecordFields
+  default-extensions: OverloadedStrings DataKinds LambdaCase DuplicateRecordFields RecordWildCards
   ghc-options: -pgml clang -optc-pipe
   ld-options: -fuse-ld=lld
   build-depends:
@@ -48,12 +51,14 @@ library
   default-language: Haskell2010
 
 executable boreal
-  main-is: Main.hs
+  main-is: Boreal.hs
   other-modules:
+      Boreal.Auth
+      Boreal.Config
       Paths_boreal
   hs-source-dirs:
       app
-  default-extensions: OverloadedStrings LambdaCase DuplicateRecordFields
+  default-extensions: OverloadedStrings DataKinds LambdaCase DuplicateRecordFields RecordWildCards
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -pgml clang -optc-pipe
   ld-options: -fuse-ld=lld
   build-depends:
@@ -77,7 +82,7 @@ test-suite boreal-test
       Paths_boreal
   hs-source-dirs:
       test
-  default-extensions: OverloadedStrings LambdaCase DuplicateRecordFields
+  default-extensions: OverloadedStrings DataKinds LambdaCase DuplicateRecordFields RecordWildCards
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson >=1.4.7.1

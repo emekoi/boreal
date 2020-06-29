@@ -64,3 +64,10 @@ packages:
 #
 # Allow a newer minor version of GHC than the snapshot specifies
 # compiler-check: newer-minor
+
+# ghc-options:
+#   "$locals": -Wall -fno-warn-name-shadowing -Wcompat -Wincomplete-uni-patterns
+#   "$everything": -fllvm -split-sections -flate-specialise -fspecialise-aggressively -O2 
+
+ghc-options:
+  "$locals": -Wall -fno-warn-name-shadowing -Wcompat -Wincomplete-uni-patterns
