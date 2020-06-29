@@ -47,4 +47,4 @@ userReAuthenticate AuthToken {..} = do
       "client_id" =: clientIdT
         <> "grant_type" =: ("refresh_token" :: Text)
         <> "refresh_token" =: refresh_token
-userReAuthenticate _ = error "cannot re-authenticate invalid auth token"
+userReAuthenticate _ = return $ Error "cannot re-authenticate invalid auth token"

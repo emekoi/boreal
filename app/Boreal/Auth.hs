@@ -11,7 +11,6 @@ import Data.Aeson ((.:), (.=), Result (..), decodeFileStrict, object, withObject
 import Data.Aeson.Encode.Pretty (encodePretty)
 import Data.Aeson.Types (Parser, Value, parseMaybe)
 import qualified Data.ByteString.Lazy.Char8 as L
-import Data.Functor ((<&>))
 import Data.Time.Clock (UTCTime, addUTCTime, getCurrentTime)
 import qualified Network.API.MAL.Auth as M
 import Network.API.MAL.Types (AuthToken (..))
@@ -28,9 +27,13 @@ getAuthToken = liftIO $ do
       case parseMaybe parseAuthInfo cfg of
         Just (at, ed) ->
           if now >= ed
-            then M.userReAuthenticate at <&> \case
-              Success at' -> Just at'
-              Error _ -> Nothing
+            then do
+              at' <- M.userReAuthenticate at
+              case at' of
+                Success at' -> do
+                  saveAuthToken at'
+                  return $ Just at'
+                Error _ -> return Nothing
             else return $ Just at
         Nothing -> return Nothing
     Nothing -> return Nothing
