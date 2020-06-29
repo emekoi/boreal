@@ -13,15 +13,13 @@ import qualified Data.ByteString.Char8 as B
 import Data.Text (Text)
 import qualified Data.Text as T
 import Network.HTTP.Req
-import System.Environment (getEnv)
-import System.IO.Unsafe (unsafePerformIO)
 
 clientIdB :: B.ByteString
-clientIdB = unsafePerformIO $ B.pack <$> getEnv "MAL_CLIENT_ID"
+clientIdB = "6114d00ca681b7701d1e15fe11a4987e"
 {-# NOINLINE clientIdB #-}
 
 clientIdT :: Text
-clientIdT = unsafePerformIO $ T.pack <$> getEnv "MAL_CLIENT_ID"
+clientIdT = "6114d00ca681b7701d1e15fe11a4987e"
 {-# NOINLINE clientIdT #-}
 
 endpointV1 :: Url 'Https
@@ -42,5 +40,3 @@ paging limit offset =
 
 fields :: [Text] -> Option 'Https
 fields f = "fields" =: T.intercalate "," f
-{- mkReq :: MonadIO m => HttpConfig -> Req a -> m a
-mkReq = runReq -}
