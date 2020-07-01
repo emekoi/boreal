@@ -16,7 +16,7 @@ tshow :: Show a => a -> Text
 tshow = T.pack . show
 
 userInfo :: MonadIO m => AuthToken -> Maybe Int -> m (Result User)
-userInfo InvalidToken {..} _ = error $ T.unpack message
+userInfo InvalidToken {..} _ = return . Error $ T.unpack message
 userInfo AuthToken {..} (Just uid) = do
   fromJSON . responseBody
     <$> runReq

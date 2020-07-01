@@ -127,31 +127,31 @@ deriveJSON defaultOptions ''AnimeListStatus
 
 data Anime
   = Anime -- an anime in the MAL database
-      { alternative_titles :: AlternativeTitles,
-        average_episode_duration :: Int, -- the average duration (in seconds) of the episodes
-        broadcast :: Broadcast,
-        created_at :: Date,
-        end_date :: Date, -- the date at which the anime ended
+      { alternative_titles :: Maybe AlternativeTitles,
+        average_episode_duration :: Maybe Int, -- the average duration (in seconds) of the episodes
+        broadcast :: Maybe Broadcast,
+        created_at :: Maybe Date,
+        end_date :: Maybe Date, -- the date at which the anime ended
         anime_id :: Int, -- the identifier of this media on MAL
         main_picture :: Picture, -- the poster artwork of the anime
-        mean :: Double, -- the mean score of this media on MAL
-        media_type :: Text, -- the type of this media (e.g. tv)
-        nsfw :: Text, -- the NSFW state for this media (e.g. white)
-        num_episodes :: Int, -- the number of episodes in this anime
-        num_favorites :: Int, -- the number of users that added this media to their favorites
-        num_list_users :: Int, -- the number of uses that added this media to their lists
-        num_scoring_users :: Int, -- (?) The number of users that voted for the scores
-        popularity :: Int, -- the popularity rankings of this anime
-        rank :: Int, -- the rankings of this anime
-        start_date :: Date, -- the date at which the anime started
-        start_season :: AnimeSeason, -- the season at which the anime started broadcasting
-        status :: Text, -- an enumeration representing the broadcasting status of the anime (e.g. finished_airing)
-        synopsis :: Text, -- the synopsis of the anime
+        mean :: Maybe Double, -- the mean score of this media on MAL
+        media_type :: Maybe Text, -- the type of this media (e.g. tv)
+        nsfw :: Maybe Text, -- the NSFW state for this media (e.g. white)
+        num_episodes :: Maybe Int, -- the number of episodes in this anime
+        num_favorites :: Maybe Int, -- the number of users that added this media to their favorites
+        num_list_users :: Maybe Int, -- the number of uses that added this media to their lists
+        num_scoring_users :: Maybe Int, -- (?) The number of users that voted for the scores
+        popularity :: Maybe Int, -- the popularity rankings of this anime
+        rank :: Maybe Int, -- the rankings of this anime
+        start_date :: Maybe Date, -- the date at which the anime started
+        start_season :: Maybe AnimeSeason, -- the season at which the anime started broadcasting
+        status :: Maybe Text, -- an enumeration representing the broadcasting status of the anime (e.g. finished_airing)
+        synopsis :: Maybe Text, -- the synopsis of the anime
         title :: Text, -- the canonical (?) title of the anime
-        updated_at :: Date, -- the last time that the information is updated on MAL
-        my_list_status :: AnimeListStatus,
-        background :: Text, -- background story of the anime
-        related_anime :: [Anime] -- a list of anime related to this anime
+        updated_at :: Maybe Date, -- the last time that the information is updated on MAL
+        my_list_status :: Maybe AnimeListStatus,
+        background :: Maybe Text, -- background story of the anime
+        related_anime :: Maybe [Anime] -- a list of anime related to this anime
       }
   deriving (Show)
 
