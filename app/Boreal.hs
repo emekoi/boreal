@@ -16,6 +16,7 @@ import qualified Data.Text as T
 import Fmt
 import qualified Network.API.MAL.Anime as M
 import qualified Network.API.MAL.Auth as M
+import Network.API.MAL.Constants (fields)
 import Network.API.MAL.Types
 import Options.Applicative ((<**>), Parser)
 import qualified Options.Applicative as O
@@ -70,7 +71,7 @@ mainBody (Search t) = do
 mainBody (List mid) = do
   getAuthToken >>= \case
     Just at@AuthToken {..} -> do
-      al <- M.getAnimeList at mempty mid
+      al <- M.getAnimeList at [fields ["my_list_status"]] mid
       case al of
         Error err -> print err
         Success al' -> printAnimeList al'
