@@ -5,9 +5,9 @@ module Network.API.MAL.Types where
 import Control.Applicative ((<|>))
 import Data.Aeson
 import Data.Aeson.TH
-import Data.Char (toLower)
+import Data.Char (isUpper, toLower)
 import Data.Function (on)
-import Data.List (stripPrefix)
+import Data.List (group, stripPrefix)
 import Data.Maybe (fromMaybe)
 import qualified Data.Text as T
 import Data.Text (Text)
@@ -58,7 +58,9 @@ data SortingMethod
 
 deriveJSON
   defaultOptions
-    { constructorTagModifier = map toLower
+    { constructorTagModifier =
+        let f c = if isUpper (head c) then "_" <> map toLower c else c
+         in \v -> fromMaybe v . stripPrefix "_" . mconcat . map f . group $ v
     }
   ''SortingMethod
 
@@ -94,7 +96,9 @@ data AnimeStatus
 
 deriveJSON
   defaultOptions
-    { constructorTagModifier = map toLower
+    { constructorTagModifier =
+        let f c = if isUpper (head c) then "_" <> map toLower c else c
+         in \v -> fromMaybe v . stripPrefix "_" . mconcat . map f . group $ v
     }
   ''AnimeStatus
 
@@ -110,16 +114,18 @@ deriveJSON defaultOptions ''AlternativeTitles
 
 data AnimeListStatus
   = AnimeListStatus -- a library entry
-      { comments :: Text,
+      { comments :: Maybe Text,
         is_rewatching :: Bool,
         num_episodes_watched :: Int,
-        num_times_rewatched :: Int,
-        priority :: Int,
-        rewatch_value :: Int,
+        num_times_rewatched :: Maybe Int,
+        priority :: Maybe Int,
+        rewatch_value :: Maybe Int,
         score :: Double,
         status :: AnimeStatus,
-        tags :: [Text],
-        updated_at :: Date
+        tags :: Maybe [Text],
+        updated_at :: Date,
+        start_date :: Maybe Date,
+        finish_date :: Maybe Date
       }
   deriving (Show)
 
@@ -149,7 +155,7 @@ data Anime
         synopsis :: Maybe Text, -- the synopsis of the anime
         title :: Text, -- the canonical (?) title of the anime
         updated_at :: Maybe Date, -- the last time that the information is updated on MAL
-        my_list_status :: Maybe AnimeListStatus,
+        my_list_status :: AnimeListStatus,
         background :: Maybe Text, -- background story of the anime
         related_anime :: Maybe [Anime] -- a list of anime related to this anime
       }

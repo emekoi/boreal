@@ -12,7 +12,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macOS-latest]
+        os: [ubuntu-latest]
 
     steps:
       - uses: actions/checkout@v2
@@ -35,7 +35,7 @@ jobs:
 
       - name: Build
         run: |
-          stack build --system-ghc --test --bench --no-run-tests --no-run-benchmarks
+          stack build -j 2 -system-ghc --test --bench --no-run-tests --no-run-benchmarks
 
       - name: Test
         run: |
