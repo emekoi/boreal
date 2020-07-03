@@ -63,7 +63,9 @@ listDrawAnime sel a =
         if sel
           then withAttr customAttr (str $ "<" <> s <> ">")
           else str s
-   in C.hCenter $ selStr (T.unpack $ title a)
+      epsWatched = show (num_episodes_watched $ my_list_status a)
+      totalEps = maybe "?" show (num_episodes a)
+   in C.hCenter . selStr $ T.unpack (title a) <> " [" <> epsWatched <> "/" <> totalEps <> "]"
 
 customAttr :: A.AttrName
 customAttr = L.listSelectedAttr <> "custom"

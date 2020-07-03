@@ -24,7 +24,7 @@ initExplorer :: MonadIO m => m Explorer
 initExplorer = do
   getAuthToken >>= \case
     Just at@AuthToken {..} -> do
-      al <- M.getAnimeList at [fields ["my_list_status"]] "@me"
+      al <- M.getAnimeList at [fields ["my_list_status", "num_episodes"]] "@me"
       case al of
         Error err -> error err
         Success al' -> return $ Explorer at (BL.list () (L.fromList 10 al') 1)
