@@ -39,7 +39,8 @@ packages:
 # - git: https://github.com/commercialhaskell/stack.git
 #   commit: e7b331f14bcffb8367cd58fbfc8b40ec7642100a
 #
-# extra-deps: []
+extra-deps:
+  - brick-0.54@sha256:a860e5cb67eaf5adbffeeb88006861303418e709e82feba5c9ae69d4c9a01432,15356
 
 # Override default flag values for local packages and extra-deps
 # flags: {}

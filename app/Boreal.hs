@@ -3,13 +3,9 @@ module Main
   )
 where
 
--- import qualified Data.ByteString.Char8 as B
-
--- import Network.HTTP.Req
-
 import Boreal.Anime
 import Boreal.Auth
--- import Boreal.Config
+import Boreal.TUI
 import Data.Aeson (Result (..))
 import Data.Text (Text)
 import qualified Data.Text as T
@@ -26,6 +22,7 @@ data Command
   | Search Text
   | List Text
   | Token
+  | TUI
   deriving (Show)
 
 login :: Parser Command
@@ -50,6 +47,7 @@ parseOpts =
     ( O.command "login" (O.info login (O.progDesc "login to your account"))
         <> O.command "search" (O.info searchAnime (O.progDesc "search for an anime"))
         <> O.command "list" (O.info listAnime (O.progDesc "show the anime list for the given user"))
+        <> O.command "tui" (O.info (pure TUI) (O.progDesc "launch the TUI interface"))
     )
     O.<|> O.hsubparser
       ( O.internal <> O.command "token" (O.info (pure Token) (O.progDesc "displays MAL auth token and re-auths if needed"))
@@ -81,6 +79,7 @@ mainBody Token = do
     Just AuthToken {..} -> do
       fmtLn ("Auth Token:\n  Access Token: " +| access_token |+ "\n  Refresh Token: " +| refresh_token |+ "")
     _ -> putStrLn "please login first"
+mainBody TUI = tuiMain
 
 main :: IO ()
 main =
