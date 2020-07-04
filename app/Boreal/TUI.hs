@@ -5,6 +5,7 @@ where
 
 import Boreal.TUI.Explorer as E
 import qualified Brick.AttrMap as A
+import Brick.BChan (newBChan, writeBChan)
 import qualified Brick.Main as M
 import qualified Brick.Types as T
 import Brick.Types
@@ -22,13 +23,19 @@ import Brick.Widgets.Core
     withAttr,
   )
 import qualified Brick.Widgets.List as L
-import Control.Monad (void)
+import Control.Concurrent (forkIO, threadDelay)
+import Control.Monad (forever, void)
+-- import Control.Monad.IO.Class (liftIO)
 import qualified Data.Text as T
 import qualified Graphics.Vty as V
 import Lens.Micro.Platform ((^.))
 import Network.API.MAL.Types
 
-drawUI :: E.Explorer -> [Widget ()]
+data UpdateList = Tick
+
+type Name = ()
+
+drawUI :: E.Explorer -> [Widget Name]
 drawUI e = [ui]
   where
     l = E.animes e
@@ -46,18 +53,22 @@ drawUI e = [ui]
       C.vCenter $
         vBox
           [ C.hCenter box,
-            str " ",
+            C.hCenter . str $ "dummy update (" <> show (tick e) <> ")",
             C.hCenter $ str "Press Esc to exit."
           ]
 
-appEvent :: E.Explorer -> T.BrickEvent () e -> T.EventM () (T.Next E.Explorer)
+appEvent :: E.Explorer -> T.BrickEvent Name UpdateList -> T.EventM Name (T.Next E.Explorer)
 appEvent ex (T.VtyEvent e) =
   case e of
     V.EvKey V.KEsc [] -> M.halt ex
     ev -> L.handleListEvent ev (E.animes ex) >>= \x -> M.continue (ex {animes = x})
+appEvent ex (T.AppEvent e) =
+  case e of
+    Tick -> do
+      M.continue ex {tick = tick ex + 1}
 appEvent ex _ = M.continue ex
 
-listDrawAnime :: Bool -> Anime -> Widget ()
+listDrawAnime :: Bool -> Anime -> Widget Name
 listDrawAnime sel a =
   let selStr s =
         if sel
@@ -79,7 +90,7 @@ theMap =
       (customAttr, fg V.cyan)
     ]
 
-theApp :: M.App E.Explorer e ()
+theApp :: M.App E.Explorer UpdateList Name
 theApp =
   M.App
     { M.appDraw = drawUI,
@@ -90,6 +101,15 @@ theApp =
     }
 
 tuiMain :: IO ()
-tuiMain =
-  E.initExplorer
-    >>= void . M.defaultMain theApp
+-- tuiMain =
+--   E.initExplorer
+--     >>= void . M.defaultMain theApp
+tuiMain = do
+  chan <- newBChan 10
+  void . forkIO $ forever $ do
+    writeBChan chan Tick
+    threadDelay 500000 -- decides how fast your game moves
+  e <- E.initExplorer
+  let buildVty = V.mkVty V.defaultConfig
+  initialVty <- buildVty
+  void $ M.customMain initialVty buildVty (Just chan) theApp e

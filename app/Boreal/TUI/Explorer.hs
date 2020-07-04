@@ -16,7 +16,8 @@ import Network.API.MAL.Types
 data Explorer
   = Explorer
       { auth_token :: AuthToken,
-        animes :: L.LazyList () Anime
+        animes :: L.LazyList () Anime,
+        tick :: Int
       }
   deriving (Show)
 
@@ -27,5 +28,5 @@ initExplorer = do
       al <- M.getAnimeList at [fields ["my_list_status", "num_episodes"]] "@me"
       case al of
         Error err -> error err
-        Success al' -> return $ Explorer at (BL.list () (L.fromList 10 al') 1)
+        Success al' -> return $ Explorer at (BL.list () (L.fromList 10 al') 1) 0
     _ -> error "please login first"
