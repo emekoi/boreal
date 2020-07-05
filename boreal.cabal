@@ -34,7 +34,7 @@ library
       Paths_boreal
   hs-source-dirs:
       src
-  default-extensions: OverloadedStrings DataKinds LambdaCase DuplicateRecordFields RecordWildCards FlexibleContexts
+  default-extensions: OverloadedStrings DataKinds LambdaCase DuplicateRecordFields RecordWildCards FlexibleContexts TupleSections
   ghc-options: -pgml clang -optc-pipe
   ld-options: -fuse-ld=lld
   build-depends:
@@ -52,6 +52,7 @@ library
     , text >=1.2.4.0
     , text-manipulate >=0.2.0.1
     , time >=1.1.0
+    , unordered-containers >=0.2.10.0
     , vector >=0.12.1.2
     , vty >=5.28.2
   default-language: Haskell2010
@@ -68,7 +69,7 @@ executable boreal
       Paths_boreal
   hs-source-dirs:
       app
-  default-extensions: OverloadedStrings DataKinds LambdaCase DuplicateRecordFields RecordWildCards FlexibleContexts
+  default-extensions: OverloadedStrings DataKinds LambdaCase DuplicateRecordFields RecordWildCards FlexibleContexts TupleSections
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -pgml clang -optc-pipe
   ld-options: -fuse-ld=lld
   build-depends:
@@ -87,6 +88,7 @@ executable boreal
     , text >=1.2.4.0
     , text-manipulate >=0.2.0.1
     , time >=1.1.0
+    , unordered-containers >=0.2.10.0
     , vector >=0.12.1.2
     , vty >=5.28.2
   default-language: Haskell2010
@@ -98,7 +100,7 @@ test-suite boreal-test
       Paths_boreal
   hs-source-dirs:
       test
-  default-extensions: OverloadedStrings DataKinds LambdaCase DuplicateRecordFields RecordWildCards FlexibleContexts
+  default-extensions: OverloadedStrings DataKinds LambdaCase DuplicateRecordFields RecordWildCards FlexibleContexts TupleSections
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson >=1.4.7.1
@@ -116,6 +118,7 @@ test-suite boreal-test
     , text >=1.2.4.0
     , text-manipulate >=0.2.0.1
     , time >=1.1.0
+    , unordered-containers >=0.2.10.0
     , vector >=0.12.1.2
     , vty >=5.28.2
   default-language: Haskell2010

@@ -22,7 +22,7 @@ data Command
   | Search Text
   | List Text
   | Token
-  | TUI
+  | TUI Text
   deriving (Show)
 
 login :: Parser Command
@@ -41,13 +41,18 @@ listAnime =
   List
     <$> O.strArgument (O.metavar "MAL_ID" <> O.help "the user's MAL id or '@me' for the currently logged in user" <> O.value "@me")
 
+tuiMode :: Parser Command
+tuiMode =
+  TUI
+    <$> O.strArgument (O.metavar "MAL_ID" <> O.help "the user's MAL id or '@me' for the currently logged in user" <> O.value "@me")
+
 parseOpts :: Parser Command
 parseOpts =
   O.hsubparser
     ( O.command "login" (O.info login (O.progDesc "login to your account"))
         <> O.command "search" (O.info searchAnime (O.progDesc "search for an anime"))
         <> O.command "list" (O.info listAnime (O.progDesc "show the anime list for the given user"))
-        <> O.command "tui" (O.info (pure TUI) (O.progDesc "launch the TUI interface"))
+        <> O.command "tui" (O.info tuiMode (O.progDesc "launch the TUI interface"))
     )
     O.<|> O.hsubparser
       ( O.internal <> O.command "token" (O.info (pure Token) (O.progDesc "displays MAL auth token and re-auths if needed"))
@@ -79,7 +84,7 @@ mainBody Token = do
     Just AuthToken {..} -> do
       fmtLn ("Auth Token:\n  Access Token: " +| access_token |+ "\n  Refresh Token: " +| refresh_token |+ "")
     _ -> putStrLn "please login first"
-mainBody TUI = tuiMain
+mainBody (TUI u) = tuiMain u
 
 main :: IO ()
 main =

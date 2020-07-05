@@ -4,6 +4,9 @@ module Boreal.TUI
 where
 
 import Boreal.TUI.Explorer as E
+-- import Control.Monad.IO.Class (liftIO)
+
+import qualified Boreal.TUI.LazyVector as LV
 import qualified Brick.AttrMap as A
 import Brick.BChan (newBChan, writeBChan)
 import qualified Brick.Main as M
@@ -25,10 +28,13 @@ import Brick.Widgets.Core
 import qualified Brick.Widgets.List as L
 import Control.Concurrent (forkIO, threadDelay)
 import Control.Monad (forever, void)
--- import Control.Monad.IO.Class (liftIO)
+import Data.Aeson (Result (..))
 import qualified Data.Text as T
+import Data.Text (Text)
 import qualified Graphics.Vty as V
 import Lens.Micro.Platform ((^.))
+import qualified Network.API.MAL.Anime as MAL
+import Network.API.MAL.Constants (fields, paging)
 import Network.API.MAL.Types
 
 data UpdateList = Tick
@@ -53,7 +59,7 @@ drawUI e = [ui]
       C.vCenter $
         vBox
           [ C.hCenter box,
-            C.hCenter . str $ "dummy update (" <> show (tick e) <> ")",
+            C.hCenter . str $ if next_page e then "updating list" else "",
             C.hCenter $ str "Press Esc to exit."
           ]
 
@@ -65,7 +71,19 @@ appEvent ex (T.VtyEvent e) =
 appEvent ex (T.AppEvent e) =
   case e of
     Tick -> do
-      M.continue ex {tick = tick ex + 1}
+      if next_page ex
+        then do
+          al <- MAL.getAnimeListP (auth_token ex) [fields ["my_list_status", "num_episodes"], paging 10 (page ex)] (user ex)
+          case al of
+            Error _ -> M.continue ex
+            Success (al', np) -> do
+              M.continue
+                ex
+                  { page = page ex + 10,
+                    next_page = np,
+                    animes = L.list () (L.listElements (animes ex) <> LV.fromList 10 al') 1
+                  }
+        else M.continue ex
 appEvent ex _ = M.continue ex
 
 listDrawAnime :: Bool -> Anime -> Widget Name
@@ -100,16 +118,13 @@ theApp =
       M.appAttrMap = const theMap
     }
 
-tuiMain :: IO ()
--- tuiMain =
---   E.initExplorer
---     >>= void . M.defaultMain theApp
-tuiMain = do
+tuiMain :: Text -> IO ()
+tuiMain u = do
   chan <- newBChan 10
   void . forkIO $ forever $ do
     writeBChan chan Tick
-    threadDelay 500000 -- decides how fast your game moves
-  e <- E.initExplorer
+    threadDelay 500000
+  e <- E.initExplorer u
   let buildVty = V.mkVty V.defaultConfig
   initialVty <- buildVty
   void $ M.customMain initialVty buildVty (Just chan) theApp e

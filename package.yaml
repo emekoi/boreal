@@ -36,6 +36,7 @@ dependencies:
 - microlens-platform >= 0.4.1
 - microlens >= 0.4.11.2
 - vector >= 0.12.1.2
+- unordered-containers >= 0.2.10.0
 
 default-extensions:
   - OverloadedStrings
@@ -44,6 +45,7 @@ default-extensions:
   - DuplicateRecordFields
   - RecordWildCards
   - FlexibleContexts
+  - TupleSections
 
 library:
   source-dirs: src

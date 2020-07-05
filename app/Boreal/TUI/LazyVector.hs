@@ -12,6 +12,8 @@ module Boreal.TUI.LazyVector
     fromList,
     fromChunks,
     splitAt,
+    appendChunk,
+    toVector,
   )
 where
 
@@ -72,6 +74,9 @@ fromList n = LazyVector . go
 
 fromChunks :: [V.Vector a] -> LazyVector a
 fromChunks = LazyVector
+
+appendChunk :: LazyVector a -> V.Vector a -> LazyVector a
+appendChunk l v = l <> LazyVector [v]
 
 toVector :: LazyVector a -> V.Vector a
 toVector (LazyVector a) = V.concat a
