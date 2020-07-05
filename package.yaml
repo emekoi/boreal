@@ -50,7 +50,6 @@ default-extensions:
 library:
   source-dirs: src
   ghc-options:
-    - '-pgml clang'
     - '-optc-pipe'
   ld-options: '-fuse-ld=lld'
 
@@ -62,7 +61,6 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
-    - '-pgml clang'
     - '-optc-pipe'
     ld-options: '-fuse-ld=lld'
     dependencies:

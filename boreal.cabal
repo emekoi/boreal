@@ -35,7 +35,7 @@ library
   hs-source-dirs:
       src
   default-extensions: OverloadedStrings DataKinds LambdaCase DuplicateRecordFields RecordWildCards FlexibleContexts TupleSections
-  ghc-options: -pgml clang -optc-pipe
+  ghc-options: -optc-pipe
   ld-options: -fuse-ld=lld
   build-depends:
       aeson >=1.4.7.1
@@ -70,7 +70,7 @@ executable boreal
   hs-source-dirs:
       app
   default-extensions: OverloadedStrings DataKinds LambdaCase DuplicateRecordFields RecordWildCards FlexibleContexts TupleSections
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N -pgml clang -optc-pipe
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -optc-pipe
   ld-options: -fuse-ld=lld
   build-depends:
       aeson >=1.4.7.1

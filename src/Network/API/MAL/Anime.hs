@@ -5,7 +5,6 @@ module Network.API.MAL.Anime
     getAnimeList,
     getAnimeListP,
     updateAnime,
-    withPaging,
   )
 where
 
@@ -28,14 +27,6 @@ parseAnimeListP :: Value -> Parser ([Anime], Bool)
 parseAnimeListP = withObject "AnimeList" $ \obj -> do
   np <- maybe False (member "next") <$> ((obj .:? "paging") :: Parser (Maybe Object))
   (,np) <$> (mapM (.: "node") <=< (parseJSONList <=< (.: "data"))) obj
-
--- map (uncurry f) $ repeat (opts', a)
--- withPaging $ flip searchAnime "t"
--- withPaging $ flip (getAnimeList at) "t"
-withPaging :: MonadIO m => Int -> [Option 'Https] -> ([Option 'Https] -> m (Result [Anime])) -> m [Result [Anime]]
-withPaging limit opts f =
-  let opts' = map (\p -> opts <> [uncurry paging p]) $ iterate (\(l, o) -> (l, o + l)) (limit, 0)
-   in mapM f opts'
 
 searchAnime :: MonadIO m => [Option 'Https] -> Text -> m (Result [Anime])
 searchAnime opts title = do

@@ -4,9 +4,6 @@ module Boreal.TUI
 where
 
 import Boreal.TUI.Explorer as E
--- import Control.Monad.IO.Class (liftIO)
-
-import qualified Boreal.TUI.LazyVector as LV
 import qualified Brick.AttrMap as A
 import Brick.BChan (newBChan, writeBChan)
 import qualified Brick.Main as M
@@ -28,13 +25,10 @@ import Brick.Widgets.Core
 import qualified Brick.Widgets.List as L
 import Control.Concurrent (forkIO, threadDelay)
 import Control.Monad (forever, void)
-import Data.Aeson (Result (..))
 import qualified Data.Text as T
 import Data.Text (Text)
 import qualified Graphics.Vty as V
 import Lens.Micro.Platform ((^.))
-import qualified Network.API.MAL.Anime as MAL
-import Network.API.MAL.Constants (fields, paging)
 import Network.API.MAL.Types
 
 data UpdateList = Tick
@@ -49,7 +43,7 @@ drawUI e = [ui]
     cur = case L.listSelected l of
       Nothing -> str "-"
       Just i -> str (show (i + 1))
-    total = str $ show $ length $ l ^. L.listElementsL
+    total = str . show . length $ l ^. L.listElementsL
     box =
       B.borderWithLabel label
         $ hLimit 50
@@ -72,17 +66,7 @@ appEvent ex (T.AppEvent e) =
   case e of
     Tick -> do
       if next_page ex
-        then do
-          al <- MAL.getAnimeListP (auth_token ex) [fields ["my_list_status", "num_episodes"], paging 10 (page ex)] (user ex)
-          case al of
-            Error _ -> M.continue ex
-            Success (al', np) -> do
-              M.continue
-                ex
-                  { page = page ex + 10,
-                    next_page = np,
-                    animes = L.list () (L.listElements (animes ex) <> LV.fromList 10 al') 1
-                  }
+        then M.continue =<< E.explorerNextPage ex
         else M.continue ex
 appEvent ex _ = M.continue ex
 
@@ -124,7 +108,7 @@ tuiMain u = do
   void . forkIO $ forever $ do
     writeBChan chan Tick
     threadDelay 500000
-  e <- E.initExplorer u
+  e <- E.initExplorer u 20
   let buildVty = V.mkVty V.defaultConfig
   initialVty <- buildVty
   void $ M.customMain initialVty buildVty (Just chan) theApp e
