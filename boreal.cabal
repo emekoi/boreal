@@ -29,12 +29,13 @@ library
       Network.API.MAL.Auth
       Network.API.MAL.Constants
       Network.API.MAL.Types
+      Network.API.MAL.Types.Lens
       Network.API.MAL.User
   other-modules:
       Paths_boreal
   hs-source-dirs:
       src
-  default-extensions: OverloadedStrings DataKinds LambdaCase DuplicateRecordFields RecordWildCards FlexibleContexts TupleSections
+  default-extensions: OverloadedStrings DataKinds LambdaCase DuplicateRecordFields RecordWildCards FlexibleContexts FlexibleInstances TupleSections
   ghc-options: -optc-pipe
   ld-options: -fuse-ld=lld
   build-depends:
@@ -47,8 +48,10 @@ library
     , fmt >=0.6.1.2
     , microlens >=0.4.11.2
     , microlens-platform >=0.4.1
+    , microlens-th >=0.4.3.5
     , optparse-applicative >=0.15.1.0
     , req >=3.2.0
+    , template-haskell >=2.15.0.0
     , text >=1.2.4.0
     , text-manipulate >=0.2.0.1
     , time >=1.1.0
@@ -69,7 +72,7 @@ executable boreal
       Paths_boreal
   hs-source-dirs:
       app
-  default-extensions: OverloadedStrings DataKinds LambdaCase DuplicateRecordFields RecordWildCards FlexibleContexts TupleSections
+  default-extensions: OverloadedStrings DataKinds LambdaCase DuplicateRecordFields RecordWildCards FlexibleContexts FlexibleInstances TupleSections
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -optc-pipe
   ld-options: -fuse-ld=lld
   build-depends:
@@ -83,8 +86,10 @@ executable boreal
     , fmt >=0.6.1.2
     , microlens >=0.4.11.2
     , microlens-platform >=0.4.1
+    , microlens-th >=0.4.3.5
     , optparse-applicative >=0.15.1.0
     , req >=3.2.0
+    , template-haskell >=2.15.0.0
     , text >=1.2.4.0
     , text-manipulate >=0.2.0.1
     , time >=1.1.0
@@ -100,7 +105,7 @@ test-suite boreal-test
       Paths_boreal
   hs-source-dirs:
       test
-  default-extensions: OverloadedStrings DataKinds LambdaCase DuplicateRecordFields RecordWildCards FlexibleContexts TupleSections
+  default-extensions: OverloadedStrings DataKinds LambdaCase DuplicateRecordFields RecordWildCards FlexibleContexts FlexibleInstances TupleSections
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson >=1.4.7.1
@@ -113,8 +118,10 @@ test-suite boreal-test
     , fmt >=0.6.1.2
     , microlens >=0.4.11.2
     , microlens-platform >=0.4.1
+    , microlens-th >=0.4.3.5
     , optparse-applicative >=0.15.1.0
     , req >=3.2.0
+    , template-haskell >=2.15.0.0
     , text >=1.2.4.0
     , text-manipulate >=0.2.0.1
     , time >=1.1.0

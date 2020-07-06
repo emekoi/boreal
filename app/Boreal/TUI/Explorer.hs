@@ -45,13 +45,13 @@ data ExplorerEvent
   | UpdateAnime AnimeListStatus
   deriving (Show)
 
-initExplorer :: MonadIO m => Text -> Int -> B.BChan ExplorerEvent -> m Explorer
+initExplorer :: (MonadIO m, MonadFail m) => Text -> Int -> B.BChan ExplorerEvent -> m Explorer
 initExplorer u l c = do
   getAuthToken >>= \case
     Just at@AuthToken {..} -> do
       al <- M.getAnimeListP at [fields ["my_list_status", "num_episodes"], paging l 0] u
       case al of
-        Error err -> error err
+        Error err -> fail err
         Success (al', np) -> do
           return $
             Explorer
@@ -62,7 +62,7 @@ initExplorer u l c = do
                 limit = l,
                 event_c = c
               }
-    _ -> error "please login first"
+    _ -> fail "please login first"
 
 explorerGetNextPage :: MonadIO m => Explorer -> m Explorer
 explorerGetNextPage e@Explorer {..} = do

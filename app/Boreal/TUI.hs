@@ -18,9 +18,10 @@ import Control.Monad.IO.Class (liftIO)
 import Data.Maybe (isJust)
 import Data.Text (Text)
 import qualified Graphics.Vty as V
-import Lens.Micro.Platform ((^.), (^?!), ix)
+import Lens.Micro.Platform
 import qualified Network.API.MAL.Anime as MAL
 import Network.API.MAL.Types
+import Network.API.MAL.Types.Lens
 
 type Name = ()
 
@@ -34,14 +35,18 @@ appEvent ex (T.VtyEvent e) =
       case E.animes ex ^. L.listSelectedL of
         Nothing -> M.continue ex
         Just i -> do
-          liftIO . writeBChan (E.event_c ex) . E.UpdateAnime . my_list_status $ getElem i
-          M.continue ex
+          let mls = getElem i ^. _my_list_status & _num_episodes_watched +~ 1
+              animes' = E.animes ex & L.listElementsL .~ ((E.animes ex ^. L.listElementsL) & ix i . _my_list_status .~ mls)
+          liftIO . writeBChan (E.event_c ex) . E.UpdateAnime $ mls
+          M.continue ex {E.animes = animes'}
     V.EvKey (V.KChar '-') [] -> do
       case E.animes ex ^. L.listSelectedL of
         Nothing -> M.continue ex
         Just i -> do
-          liftIO . writeBChan (E.event_c ex) . E.UpdateAnime . my_list_status $ getElem i
-          M.continue ex
+          let mls = getElem i ^. _my_list_status & _num_episodes_watched -~ 1
+              animes' = E.animes ex & L.listElementsL .~ ((E.animes ex ^. L.listElementsL) & ix i . _my_list_status .~ mls)
+          liftIO . writeBChan (E.event_c ex) . E.UpdateAnime $ mls
+          M.continue ex {E.animes = animes'}
     V.EvKey V.KEsc [] -> M.halt ex
     ev -> L.handleListEvent ev (E.animes ex) >>= \x -> M.continue (ex {E.animes = x})
   where
@@ -52,7 +57,6 @@ appEvent e (T.AppEvent E.UpdateList) = do
     else M.continue e
 appEvent e@E.Explorer {..} (T.AppEvent (E.UpdateAnime als)) = do
   -- _ <- MAL.updateAnime auth_token undefined als
-  liftIO $ print als
   M.continue e
 appEvent e _ = M.continue e
 
