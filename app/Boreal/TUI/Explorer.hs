@@ -1,3 +1,6 @@
+{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE TemplateHaskell #-}
+
 module Boreal.TUI.Explorer
   ( Explorer (..),
     ExplorerEvent (..),
@@ -5,6 +8,13 @@ module Boreal.TUI.Explorer
     explorerGetNextPage,
     drawExplorer,
     explorerAttrMap,
+    dirtyAttr,
+    _auth_token,
+    _user,
+    _animes,
+    _next_page,
+    _limit,
+    _event_c,
   )
 where
 
@@ -29,6 +39,12 @@ import Lens.Micro.Platform ((&), (<>~), (^.))
 import qualified Network.API.MAL.Anime as M
 import Network.API.MAL.Constants (fields, paging)
 import Network.API.MAL.Types
+import Network.API.MAL.Types.Lens
+
+data ExplorerEvent
+  = UpdateList
+  | UpdateAnime (Int, Anime)
+  deriving (Show)
 
 data Explorer
   = Explorer
@@ -40,10 +56,7 @@ data Explorer
         event_c :: B.BChan ExplorerEvent
       }
 
-data ExplorerEvent
-  = UpdateList
-  | UpdateAnime AnimeListStatus
-  deriving (Show)
+makeFieldsNoPrefix ''Explorer
 
 initExplorer :: (MonadIO m, MonadFail m) => Text -> Int -> B.BChan ExplorerEvent -> m Explorer
 initExplorer u l c = do
@@ -82,19 +95,23 @@ explorerGetNextPage e@Explorer {..} = do
             next_page = if np then (+ limit) <$> next_page else Nothing
           }
 
-explorerAttr :: A.AttrName
-explorerAttr = B.listSelectedAttr <> "selected"
+selectedAttr :: A.AttrName
+selectedAttr = B.listSelectedAttr <> "selected"
+
+dirtyAttr :: A.AttrName
+dirtyAttr = A.attrName "dirty"
 
 explorerAttrMap :: [(A.AttrName, V.Attr)]
 explorerAttrMap =
-  [ (explorerAttr, V.withStyle (B.fg V.red) V.bold)
+  [ (dirtyAttr, V.withStyle (B.fg V.red) V.bold),
+    (selectedAttr, V.withStyle (B.fg V.cyan) V.bold)
   ]
 
 listDrawAnime :: Bool -> Anime -> B.Widget ()
 listDrawAnime sel a =
   let selStr s =
         if sel
-          then B.withAttr explorerAttr (B.str $ "<" <> s <> ">")
+          then B.withAttr selectedAttr (B.str $ "<" <> s <> ">")
           else B.str s
       epsWatched = show (num_episodes_watched $ my_list_status a)
       totalEps = maybe "?" show (num_episodes a)

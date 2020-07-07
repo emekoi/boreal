@@ -1,8 +1,6 @@
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE TemplateHaskell #-}
 
--- {-# LANGUAGE MultiParamTypeClasses #-}
-
 module Network.API.MAL.Types where
 
 import Control.Applicative ((<|>))

@@ -3,7 +3,7 @@ module Boreal.TUI
   )
 where
 
-import qualified Boreal.TUI.Explorer as E
+import Boreal.TUI.Explorer as E
 import qualified Brick.AttrMap as A
 import Brick.BChan (newBChan, writeBChan)
 import qualified Brick.Main as M
@@ -15,13 +15,13 @@ import qualified Brick.Widgets.List as L
 import Control.Concurrent (forkIO, threadDelay)
 import Control.Monad (void)
 import Control.Monad.IO.Class (liftIO)
+import Data.Aeson (Result (..))
 import Data.Maybe (isJust)
 import Data.Text (Text)
 import qualified Graphics.Vty as V
 import Lens.Micro.Platform
 import qualified Network.API.MAL.Anime as MAL
 import Network.API.MAL.Types
-import Network.API.MAL.Types.Lens
 
 type Name = ()
 
@@ -34,30 +34,32 @@ appEvent ex (T.VtyEvent e) =
     V.EvKey (V.KChar '+') [] -> do
       case E.animes ex ^. L.listSelectedL of
         Nothing -> M.continue ex
-        Just i -> do
-          let mls = getElem i ^. _my_list_status & _num_episodes_watched +~ 1
-              animes' = E.animes ex & L.listElementsL .~ ((E.animes ex ^. L.listElementsL) & ix i . _my_list_status .~ mls)
-          liftIO . writeBChan (E.event_c ex) . E.UpdateAnime $ mls
-          M.continue ex {E.animes = animes'}
+        Just i ->
+          M.continue $ ex & _animes %~ L.listElementsL %~ ix i . _my_list_status . _num_episodes_watched +~ 1
     V.EvKey (V.KChar '-') [] -> do
       case E.animes ex ^. L.listSelectedL of
         Nothing -> M.continue ex
-        Just i -> do
-          let mls = getElem i ^. _my_list_status & _num_episodes_watched -~ 1
-              animes' = E.animes ex & L.listElementsL .~ ((E.animes ex ^. L.listElementsL) & ix i . _my_list_status .~ mls)
-          liftIO . writeBChan (E.event_c ex) . E.UpdateAnime $ mls
-          M.continue ex {E.animes = animes'}
+        Just i ->
+          M.continue $ ex & _animes %~ L.listElementsL %~ ix i . _my_list_status . _num_episodes_watched -~ 1
+    V.EvKey V.KEnter [] -> do
+      case E.animes ex ^. L.listSelectedL of
+        Nothing -> M.continue ex
+        Just i ->
+          (liftIO . writeBChan (E.event_c ex) . E.UpdateAnime $ (i, getAnime ex i)) >> M.continue ex
     V.EvKey V.KEsc [] -> M.halt ex
-    ev -> L.handleListEvent ev (E.animes ex) >>= \x -> M.continue (ex {E.animes = x})
+    ev -> L.handleListEvent ev (E.animes ex) >>= \x -> M.continue (ex & _animes .~ x)
   where
-    getElem i = E.animes ex ^?! L.listElementsL . ix i
+    getAnime e i = E.animes e ^?! L.listElementsL . ix i
 appEvent e (T.AppEvent E.UpdateList) = do
   if isJust $ E.next_page e
     then M.continue =<< E.explorerGetNextPage e
     else M.continue e
-appEvent e@E.Explorer {..} (T.AppEvent (E.UpdateAnime als)) = do
-  -- _ <- MAL.updateAnime auth_token undefined als
-  M.continue e
+appEvent e@E.Explorer {..} (T.AppEvent (E.UpdateAnime (i, a))) = do
+  a' <- MAL.updateAnime auth_token a $ a ^. _my_list_status
+  case a' of
+    Error err -> Prelude.error err
+    Success as' ->
+      M.continue $ e & _animes %~ L.listElementsL %~ ix i . _my_list_status .~ as'
 appEvent e _ = M.continue e
 
 theMap :: A.AttrMap
