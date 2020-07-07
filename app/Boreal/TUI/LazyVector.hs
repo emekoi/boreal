@@ -3,6 +3,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE ViewPatterns #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
 -- inspired by the Purebred.LazyVector
@@ -17,6 +18,7 @@ module Boreal.TUI.LazyVector
     appendChunk,
     fromListChunked,
     toVector,
+    toChunks,
   )
 where
 
@@ -24,9 +26,9 @@ import qualified Brick.Widgets.List as Brick
 import Control.Applicative (Applicative (..))
 import qualified Control.Applicative as A
 import Control.Monad (Monad (..), ap)
-import Data.Bool (otherwise)
+import Data.Bool (Bool (..), otherwise)
 import Data.Eq (Eq (..))
-import Data.Foldable (Foldable, length)
+import Data.Foldable (Foldable, length, null)
 import Data.Function ((.))
 import Data.Functor ((<$>), Functor)
 import Data.Int (Int)
@@ -36,12 +38,12 @@ import Data.Ord (Ord (..))
 import Data.Semigroup (Semigroup (..))
 import Data.Traversable (Traversable)
 import qualified Data.Vector as V
+import GHC.Base (($), (&&))
 import GHC.Exts (IsList (..))
+import GHC.Num ((+), (-))
 import Lens.Micro
 import Lens.Micro.Internal
 import Text.Show (Show)
-import Prelude (($), (&&), (+), (-))
-import qualified Prelude as P
 
 type LazyList n e = Brick.GenericList n LazyVector e
 
@@ -49,8 +51,8 @@ newtype LazyVector e = LazyVector [V.Vector e]
   deriving (Functor, Foldable, Traversable, Show)
 
 instance Semigroup (LazyVector e) where
-  LazyVector [] <> LazyVector b = LazyVector b
-  LazyVector a <> LazyVector [] = LazyVector a
+  (null -> True) <> LazyVector b = LazyVector b
+  LazyVector a <> (null -> True) = LazyVector a
   LazyVector a <> LazyVector b = LazyVector (a <> b)
 
 instance Applicative LazyVector where
@@ -128,31 +130,32 @@ splitAt i (LazyVector chunks) = case chunks of
 --   Just f -> Just f
 --   Nothing -> findSL p (LazyVector v')
 
+merge :: Foldable t => t a -> [t a] -> [t a]
+merge a b = if null a then b else a : b
+
 instance Cons (LazyVector a) (LazyVector b) a b where
   _Cons _ (LazyVector []) = pure $ LazyVector []
   _Cons f (LazyVector xs) =
     let go (a, as) = fromChunks $ V.singleton a : toChunks as
-        conMerge a b = if V.null a then b else a : b
-     in go <$> f (V.head $ P.head xs, fromChunks $ conMerge (V.tail $ P.head xs) (P.tail xs))
+     in go <$> f (V.head $ L.head xs, fromChunks $ merge (V.tail $ L.head xs) (L.tail xs))
   {-# INLINE _Cons #-}
 
 instance Snoc (LazyVector a) (LazyVector b) a b where
   _Snoc _ (LazyVector []) = pure $ LazyVector []
   _Snoc f (LazyVector xs) =
     let go (as, a) = fromChunks $ toChunks as <> [V.singleton a]
-        conMerge a b = if V.null b then a else a <> [b]
-     in go <$> f (fromChunks $ conMerge (P.init xs) (V.init $ P.last xs), V.last $ P.last xs)
+     in go <$> f (fromChunks $ merge (V.init $ L.last xs) (L.init xs), V.last $ L.last xs)
   {-# INLINE _Snoc #-}
 
 type instance Index (LazyVector a) = Int
 
 type instance IxValue (LazyVector a) = a
 
-instance Ixed (LazyVector a) where
+instance Show a => Ixed (LazyVector a) where
   ix i f lv
-    | 0 <= i && i < length lv = f v <&> \u -> do
-      let (LazyVector h, LazyVector t) = splitAt i lv
-      LazyVector $ h <> (V.singleton u : t ^. _tail)
+    | 0 <= i && i < length lv = f v <&> \u ->
+      let (h, t) = splitAt i lv
+       in h <> fromChunks (V.singleton u : toChunks (t ^. _tail))
     | otherwise = pure lv
     where
       v = splitAt (i + 1) lv ^?! _1 . _last
