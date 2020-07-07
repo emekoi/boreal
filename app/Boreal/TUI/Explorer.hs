@@ -15,6 +15,7 @@ module Boreal.TUI.Explorer
     _next_page,
     _limit,
     _event_c,
+    _dirty,
   )
 where
 
@@ -53,7 +54,8 @@ data Explorer
         animes :: L.LazyList () Anime,
         next_page :: Maybe Int,
         limit :: Int,
-        event_c :: B.BChan ExplorerEvent
+        event_c :: B.BChan ExplorerEvent,
+        dirty :: [Anime]
       }
 
 makeFieldsNoPrefix ''Explorer
@@ -73,7 +75,8 @@ initExplorer u l c = do
                 animes = B.list () (L.fromList al') 1,
                 next_page = if np then Just l else Nothing,
                 limit = l,
-                event_c = c
+                event_c = c,
+                dirty = []
               }
     _ -> fail "please login first"
 
@@ -99,7 +102,7 @@ selectedAttr :: A.AttrName
 selectedAttr = B.listSelectedAttr <> "selected"
 
 dirtyAttr :: A.AttrName
-dirtyAttr = A.attrName "dirty"
+dirtyAttr = B.listAttr <> "dirty"
 
 explorerAttrMap :: [(A.AttrName, V.Attr)]
 explorerAttrMap =
@@ -107,15 +110,17 @@ explorerAttrMap =
     (selectedAttr, V.withStyle (B.fg V.cyan) V.bold)
   ]
 
-listDrawAnime :: Bool -> Anime -> B.Widget ()
-listDrawAnime sel a =
-  let selStr s =
-        if sel
-          then B.withAttr selectedAttr (B.str $ "<" <> s <> ">")
-          else B.str s
-      epsWatched = show (num_episodes_watched $ my_list_status a)
+renderItem :: Explorer -> Bool -> Anime -> (String -> B.Widget ())
+renderItem e sel a s
+  | sel = B.withAttr selectedAttr (B.str $ "<" <> s <> ">")
+  | a `elem` e ^. _dirty = B.withAttr dirtyAttr (B.str s)
+  | otherwise = B.str s
+
+listDrawAnime :: Explorer -> Bool -> Anime -> B.Widget ()
+listDrawAnime e sel a =
+  let epsWatched = show (num_episodes_watched $ my_list_status a)
       totalEps = maybe "?" show (num_episodes a)
-   in C.hCenter . selStr $ T.unpack (title a) <> " [" <> epsWatched <> "/" <> totalEps <> "]"
+   in C.hCenter . renderItem e sel a $ T.unpack (title a) <> " [" <> epsWatched <> "/" <> totalEps <> "]"
 
 drawExplorer :: Explorer -> [B.Widget ()]
 drawExplorer e = [ui]
@@ -130,7 +135,7 @@ drawExplorer e = [ui]
       B.borderWithLabel label
         $ B.hLimit 100
         $ B.vLimit 15
-        $ B.renderList listDrawAnime True l
+        $ B.renderList (listDrawAnime e) True l
     ui =
       B.vBox
         [ C.hCenter box,

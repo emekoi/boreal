@@ -16,6 +16,7 @@ import Control.Concurrent (forkIO, threadDelay)
 import Control.Monad (void)
 import Control.Monad.IO.Class (liftIO)
 import Data.Aeson (Result (..))
+import Data.List (delete)
 import Data.Maybe (isJust)
 import Data.Text (Text)
 import qualified Graphics.Vty as V
@@ -34,13 +35,13 @@ appEvent ex (T.VtyEvent e) =
     V.EvKey (V.KChar '+') [] -> do
       case E.animes ex ^. L.listSelectedL of
         Nothing -> M.continue ex
-        Just i ->
-          M.continue $ ex & _animes %~ L.listElementsL %~ ix i . _my_list_status . _num_episodes_watched +~ 1
+        Just i -> do
+          M.continue $ addDirty ex i & _animes %~ L.listElementsL %~ ix i . _my_list_status . _num_episodes_watched +~ 1
     V.EvKey (V.KChar '-') [] -> do
       case E.animes ex ^. L.listSelectedL of
         Nothing -> M.continue ex
         Just i ->
-          M.continue $ ex & _animes %~ L.listElementsL %~ ix i . _my_list_status . _num_episodes_watched -~ 1
+          M.continue $ addDirty ex i & _animes %~ L.listElementsL %~ ix i . _my_list_status . _num_episodes_watched -~ 1
     V.EvKey V.KEnter [] -> do
       case E.animes ex ^. L.listSelectedL of
         Nothing -> M.continue ex
@@ -49,6 +50,9 @@ appEvent ex (T.VtyEvent e) =
     V.EvKey V.KEsc [] -> M.halt ex
     ev -> L.handleListEvent ev (E.animes ex) >>= \x -> M.continue (ex & _animes .~ x)
   where
+    addDirty e i =
+      let anime = e ^. _animes . L.listElementsL ^?! ix i
+       in if anime `notElem` e ^. _dirty then e & _dirty %~ (anime :) else e
     getAnime e i = E.animes e ^?! L.listElementsL . ix i
 appEvent e (T.AppEvent E.UpdateList) = do
   if isJust $ E.next_page e
@@ -59,7 +63,7 @@ appEvent e@E.Explorer {..} (T.AppEvent (E.UpdateAnime (i, a))) = do
   case a' of
     Error err -> Prelude.error err
     Success as' ->
-      M.continue $ e & _animes %~ L.listElementsL %~ ix i . _my_list_status .~ as'
+      M.continue $ e & _animes %~ L.listElementsL %~ ix i . _my_list_status .~ as' & _dirty %~ delete a
 appEvent e _ = M.continue e
 
 theMap :: A.AttrMap
