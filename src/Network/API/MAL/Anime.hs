@@ -121,16 +121,17 @@ updateAnime AuthToken {..} a asl = do
       ( req
           PUT
           (endpointV2 /: "anime" /: (T.pack . show . anime_id $ a) /: "my_list_status")
-          (ReqBodyUrlEnc $ params asl)
+          (traceShowId . ReqBodyUrlEnc $ params asl)
           jsonResponse
           (baseHeaders <> oAuth2Bearer (encodeUtf8 access_token))
       )
   where
-    params AnimeListStatus {..} =
-      mconcat
-        [ "num_watched_episodes" =: tshow num_episodes_watched,
-          "status" =: tshow status,
-          "score" =: tshow score,
-          maybe mempty (("start_date" =:) . tshow) start_date,
-          maybe mempty (("finish_date" =:) . tshow) finish_date
-        ]
+    params a@AnimeListStatus {..} =
+      traceShow a $
+        mconcat
+          [ "num_watched_episodes" =: tshow num_episodes_watched,
+            "status" =: tshow status,
+            "score" =: tshow score,
+            maybe mempty (("start_date" =:) . tshow) start_date,
+            maybe mempty (("finish_date" =:) . tshow) finish_date
+          ]

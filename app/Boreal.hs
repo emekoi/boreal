@@ -10,12 +10,11 @@ import Boreal.TUI
 import Data.Aeson (Result (..))
 import Data.Text (Text)
 import qualified Data.Text as T
-import Fmt
 import qualified Network.API.MAL.Anime as M
 import qualified Network.API.MAL.Auth as M
 import Network.API.MAL.Constants (fields)
 import Network.API.MAL.Types
-import Options.Applicative (Parser, (<**>))
+import Options.Applicative ((<**>), Parser)
 import qualified Options.Applicative as O
 
 data Command
@@ -83,7 +82,14 @@ mainBody (List mid) = do
 mainBody Token = do
   getAuthToken >>= \case
     Just AuthToken {..} -> do
-      fmtLn ("Auth Token:\n  Access Token: " +| access_token |+ "\n  Refresh Token: " +| refresh_token |+ "")
+      mapM_
+        putStr
+        [ "Auth Token:\n  Access Token: ",
+          T.unpack access_token,
+          "\n  Refresh Token: ",
+          T.unpack refresh_token,
+          "\n"
+        ]
     _ -> putStrLn "please login first"
 mainBody (TUI u) = tuiMain u
 

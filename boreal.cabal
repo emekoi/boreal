@@ -45,7 +45,6 @@ library
     , brick >=0.55
     , bytestring >=0.10.10
     , directory >=1.3.6.0
-    , fmt >=0.6.1.2
     , http-client >=0.6.4.1
     , microlens >=0.4.11.2
     , microlens-platform >=0.4.1
@@ -83,7 +82,6 @@ executable boreal
     , brick >=0.55
     , bytestring >=0.10.10
     , directory >=1.3.6.0
-    , fmt >=0.6.1.2
     , http-client >=0.6.4.1
     , microlens >=0.4.11.2
     , microlens-platform >=0.4.1
@@ -115,7 +113,6 @@ test-suite boreal-test
     , brick >=0.55
     , bytestring >=0.10.10
     , directory >=1.3.6.0
-    , fmt >=0.6.1.2
     , http-client >=0.6.4.1
     , microlens >=0.4.11.2
     , microlens-platform >=0.4.1

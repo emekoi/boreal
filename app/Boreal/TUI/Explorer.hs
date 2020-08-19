@@ -35,7 +35,6 @@ import Brick.Widgets.ProgressBar
 import Control.Monad.IO.Class (MonadIO)
 import Data.Aeson (Result (..))
 import Data.Maybe (fromMaybe, isJust)
-import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Graphics.Vty as V
 import Lens.Micro.Platform ((&), (<>~), (^.))
@@ -53,7 +52,7 @@ data ExplorerEvent
 data Explorer
   = Explorer
       { auth_token :: AuthToken,
-        user :: Text,
+        user :: T.Text,
         animes :: L.LazyList () Anime,
         next_page :: Maybe Int,
         limit :: Int,
@@ -64,7 +63,7 @@ data Explorer
 
 makeFieldsNoPrefix ''Explorer
 
-initExplorer :: (MonadIO m, MonadFail m) => Text -> Int -> B.BChan ExplorerEvent -> m Explorer
+initExplorer :: (MonadIO m, MonadFail m) => T.Text -> Int -> B.BChan ExplorerEvent -> m Explorer
 initExplorer u l c = do
   getAuthToken >>= \case
     Just at@AuthToken {..} -> do
