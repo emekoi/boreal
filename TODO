@@ -1,3 +1,4 @@
 - [ ] turn more fields into enums
-- [ ] get anime status
-- [ ] update anime status
+- [x] get anime status
+- [x] update anime status
+- [ ] re-write `Boreal.TUI.SegmentedList`

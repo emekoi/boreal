@@ -3,10 +3,24 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages: []
+packages:
+- completed:
+    hackage: brick-0.55@sha256:c7ccbb4c15f05e0c5f82402225a8cfd4cd9f5f923ad02f83ad9693bd3dd49455,15356
+    pantry-tree:
+      size: 5999
+      sha256: 141c7d0b93dc2da9dc36f3c337281a03778bd25d6c8e41303814846ad03ef190
+  original:
+    hackage: brick-0.55@sha256:c7ccbb4c15f05e0c5f82402225a8cfd4cd9f5f923ad02f83ad9693bd3dd49455,15356
+- completed:
+    hackage: vty-5.30@sha256:4af3938d7b9e6096e222bf52d0ea5d39873bc6fe19febd34106906306af13730,20857
+    pantry-tree:
+      size: 5330
+      sha256: d7af4668450596f7becd5317f81199e3ccd890e1c8e9a9186343d3b39f76619e
+  original:
+    hackage: vty-5.30@sha256:4af3938d7b9e6096e222bf52d0ea5d39873bc6fe19febd34106906306af13730,20857
 snapshots:
 - completed:
-    size: 531674
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/16/2.yaml
-    sha256: 4b08fb9338ca297de7ade8318f4be1216f14dff8c0426c001fb7886ee88cb84a
-  original: lts-16.2
+    size: 532383
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/16/10.yaml
+    sha256: 469d781ab6d2a4eceed6b31b6e4ec842dcd3cd1d11577972e86902603dce24df
+  original: lts-16.10

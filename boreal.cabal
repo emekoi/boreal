@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.1.
+-- This file has been generated from package.yaml by hpack version 0.34.2.
 --
 -- see: https://github.com/sol/hpack
 
@@ -29,26 +29,34 @@ library
       Network.API.MAL.Auth
       Network.API.MAL.Constants
       Network.API.MAL.Types
+      Network.API.MAL.Types.Lens
       Network.API.MAL.User
   other-modules:
       Paths_boreal
   hs-source-dirs:
       src
-  default-extensions: OverloadedStrings DataKinds LambdaCase DuplicateRecordFields RecordWildCards FlexibleContexts
-  ghc-options: -pgml clang -optc-pipe
+  default-extensions: OverloadedStrings DataKinds LambdaCase DuplicateRecordFields RecordWildCards FlexibleContexts FlexibleInstances TupleSections
+  ghc-options: -optc-pipe
   ld-options: -fuse-ld=lld
   build-depends:
       aeson >=1.4.7.1
     , aeson-pretty >=0.8.8
     , base >=4.7 && <5
+    , brick >=0.55
     , bytestring >=0.10.10
     , directory >=1.3.6.0
-    , fmt >=0.6.1.2
+    , http-client >=0.6.4.1
+    , microlens >=0.4.11.2
+    , microlens-platform >=0.4.1
+    , microlens-th >=0.4.3.5
     , optparse-applicative >=0.15.1.0
     , req >=3.2.0
+    , template-haskell >=2.15.0.0
     , text >=1.2.4.0
-    , text-manipulate >=0.2.0.1
     , time >=1.1.0
+    , unordered-containers >=0.2.10.0
+    , vector >=0.12.1.2
+    , vty >=5.28.2
   default-language: Haskell2010
 
 executable boreal
@@ -57,25 +65,35 @@ executable boreal
       Boreal.Anime
       Boreal.Auth
       Boreal.Config
+      Boreal.TUI
+      Boreal.TUI.Explorer
+      Boreal.TUI.LazyVector
       Paths_boreal
   hs-source-dirs:
       app
-  default-extensions: OverloadedStrings DataKinds LambdaCase DuplicateRecordFields RecordWildCards FlexibleContexts
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N -pgml clang -optc-pipe
+  default-extensions: OverloadedStrings DataKinds LambdaCase DuplicateRecordFields RecordWildCards FlexibleContexts FlexibleInstances TupleSections
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -optc-pipe
   ld-options: -fuse-ld=lld
   build-depends:
       aeson >=1.4.7.1
     , aeson-pretty >=0.8.8
     , base >=4.7 && <5
     , boreal
+    , brick >=0.55
     , bytestring >=0.10.10
     , directory >=1.3.6.0
-    , fmt >=0.6.1.2
+    , http-client >=0.6.4.1
+    , microlens >=0.4.11.2
+    , microlens-platform >=0.4.1
+    , microlens-th >=0.4.3.5
     , optparse-applicative >=0.15.1.0
     , req >=3.2.0
+    , template-haskell >=2.15.0.0
     , text >=1.2.4.0
-    , text-manipulate >=0.2.0.1
     , time >=1.1.0
+    , unordered-containers >=0.2.10.0
+    , vector >=0.12.1.2
+    , vty >=5.28.2
   default-language: Haskell2010
 
 test-suite boreal-test
@@ -85,19 +103,26 @@ test-suite boreal-test
       Paths_boreal
   hs-source-dirs:
       test
-  default-extensions: OverloadedStrings DataKinds LambdaCase DuplicateRecordFields RecordWildCards FlexibleContexts
+  default-extensions: OverloadedStrings DataKinds LambdaCase DuplicateRecordFields RecordWildCards FlexibleContexts FlexibleInstances TupleSections
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson >=1.4.7.1
     , aeson-pretty >=0.8.8
     , base >=4.7 && <5
     , boreal
+    , brick >=0.55
     , bytestring >=0.10.10
     , directory >=1.3.6.0
-    , fmt >=0.6.1.2
+    , http-client >=0.6.4.1
+    , microlens >=0.4.11.2
+    , microlens-platform >=0.4.1
+    , microlens-th >=0.4.3.5
     , optparse-applicative >=0.15.1.0
     , req >=3.2.0
+    , template-haskell >=2.15.0.0
     , text >=1.2.4.0
-    , text-manipulate >=0.2.0.1
     , time >=1.1.0
+    , unordered-containers >=0.2.10.0
+    , vector >=0.12.1.2
+    , vty >=5.28.2
   default-language: Haskell2010

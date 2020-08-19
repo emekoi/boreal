@@ -1,3 +1,4 @@
+{-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 module Network.API.MAL.Types where
@@ -13,6 +14,7 @@ import qualified Data.Text as T
 import Data.Text (Text)
 import Data.Time (Day, DayOfWeek, ZonedTime)
 import Data.Time.Format.ISO8601 (iso8601ParseM, iso8601Show)
+import Network.API.MAL.Types.Lens
 
 data Broadcast
   = Broadcast -- the broadcasting schedule of the anime
@@ -26,6 +28,8 @@ deriveJSON
     { constructorTagModifier = map toLower
     }
   ''Broadcast
+
+makeFieldsNoPrefix ''Broadcast
 
 data Date
   = ZonedTime ZonedTime -- an iso8601 formatted time string
@@ -48,6 +52,8 @@ data Picture
   deriving (Show)
 
 deriveJSON defaultOptions ''Picture
+
+makeFieldsNoPrefix ''Picture
 
 data SortingMethod
   = AnimeTitle -- the method of sorting entries in response lists
@@ -86,6 +92,8 @@ data AnimeSeason
 
 deriveJSON defaultOptions ''AnimeSeason
 
+makeFieldsNoPrefix ''AnimeSeason
+
 data AnimeStatus
   = Watching
   | Completed
@@ -112,6 +120,8 @@ data AlternativeTitles
 
 deriveJSON defaultOptions ''AlternativeTitles
 
+makeFieldsNoPrefix ''AlternativeTitles
+
 data AnimeListStatus
   = AnimeListStatus -- a library entry
       { comments :: Maybe Text,
@@ -130,6 +140,8 @@ data AnimeListStatus
   deriving (Show)
 
 deriveJSON defaultOptions ''AnimeListStatus
+
+makeFieldsNoPrefix ''AnimeListStatus
 
 data Anime
   = Anime -- an anime in the MAL database
@@ -167,6 +179,8 @@ deriveJSON
     }
   ''Anime
 
+makeFieldsNoPrefix ''Anime
+
 instance Eq Anime where
   a == b = on (==) anime_id a b
 
@@ -188,6 +202,8 @@ deriveJSON
     }
   ''User
 
+makeFieldsNoPrefix ''User
+
 data AuthToken
   = AuthToken
       { expires_in :: Int,
@@ -195,7 +211,7 @@ data AuthToken
         refresh_token :: Text
       }
   | InvalidToken
-      { _error :: Text,
+      { error :: Text,
         message :: Text,
         hint :: Maybe Text
       }
@@ -203,7 +219,8 @@ data AuthToken
 
 deriveJSON
   defaultOptions
-    { fieldLabelModifier = \v -> fromMaybe v $ stripPrefix "_" v,
-      sumEncoding = UntaggedValue
+    { sumEncoding = UntaggedValue
     }
   ''AuthToken
+
+makeFieldsNoPrefix ''AuthToken

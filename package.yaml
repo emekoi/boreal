@@ -22,7 +22,6 @@ description:         Please see the README on GitHub at <https://github.com/emek
 dependencies:
 - base >= 4.7 && < 5
 - text >= 1.2.4.0
-- text-manipulate >= 0.2.0.1
 - time >= 1.1.0
 - req >= 3.2.0
 - aeson >= 1.4.7.1
@@ -30,7 +29,16 @@ dependencies:
 - bytestring >= 0.10.10
 - optparse-applicative >= 0.15.1.0
 - directory >= 1.3.6.0
-- fmt >= 0.6.1.2
+- brick >= 0.55
+- vty >= 5.28.2
+- microlens-platform >= 0.4.1
+- microlens >= 0.4.11.2
+- microlens-th >= 0.4.3.5
+- vector >= 0.12.1.2
+- unordered-containers >= 0.2.10.0
+- template-haskell >= 2.15.0.0
+- http-client >= 0.6.4.1
+# - fmt >= 0.6.1.2
 
 default-extensions:
   - OverloadedStrings
@@ -39,11 +47,12 @@ default-extensions:
   - DuplicateRecordFields
   - RecordWildCards
   - FlexibleContexts
+  - FlexibleInstances
+  - TupleSections
 
 library:
   source-dirs: src
   ghc-options:
-    - '-pgml clang'
     - '-optc-pipe'
   ld-options: '-fuse-ld=lld'
 
@@ -55,7 +64,6 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
-    - '-pgml clang'
     - '-optc-pipe'
     ld-options: '-fuse-ld=lld'
     dependencies:
