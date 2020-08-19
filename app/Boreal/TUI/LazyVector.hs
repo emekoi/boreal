@@ -115,21 +115,6 @@ splitAt i (LazyVector chunks) = case chunks of
       let (LazyVector h', LazyVector t') = splitAt (i - length h) (LazyVector t)
        in (LazyVector (h : h'), LazyVector t')
 
--- elemSL :: Eq a => a -> LazyVector a -> Bool
--- elemSL _ (LazyVector []) = False
--- elemSL x (LazyVector [v]) = Vec.elem x v
--- elemSL x (LazyVector (v : v')) = Vec.elem x v || elemSL x (LazyVector v')
-
--- notElemSL :: Eq a => a -> LazyVector a -> Bool
--- notElemSL x = not . elemSL x
-
--- findSL :: (a -> Bool) -> LazyVector a -> Maybe a
--- findSL _ (LazyVector []) = Nothing
--- findSL p (LazyVector [v]) = Vec.find p v
--- findSL p (LazyVector (v : v')) = case Vec.find p v of
---   Just f -> Just f
---   Nothing -> findSL p (LazyVector v')
-
 merge :: Foldable t => t a -> [t a] -> [t a]
 merge a b = if null a then b else a : b
 

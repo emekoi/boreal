@@ -1,5 +1,6 @@
 module Main
   ( main,
+    mainBody,
   )
 where
 
@@ -14,7 +15,7 @@ import qualified Network.API.MAL.Anime as M
 import qualified Network.API.MAL.Auth as M
 import Network.API.MAL.Constants (fields)
 import Network.API.MAL.Types
-import Options.Applicative ((<**>), Parser)
+import Options.Applicative (Parser, (<**>))
 import qualified Options.Applicative as O
 
 data Command
@@ -88,9 +89,9 @@ mainBody (TUI u) = tuiMain u
 
 main :: IO ()
 main =
-  mainBody
-    =<< O.execParser
-      ( O.info
-          (parseOpts <**> O.helper)
-          (O.fullDesc <> O.progDesc "a MAL command line client")
-      )
+  O.execParser
+    ( O.info
+        (parseOpts <**> O.helper)
+        (O.fullDesc <> O.progDesc "a MAL command line client")
+    )
+    >>= mainBody

@@ -16,6 +16,7 @@ module Boreal.TUI.Explorer
     _limit,
     _event_c,
     _dirty,
+    _ticks,
   )
 where
 
@@ -27,9 +28,10 @@ import qualified Brick.Types as B
 import qualified Brick.Util as B
 import qualified Brick.Widgets.Border as B
 import qualified Brick.Widgets.Center as C
-import qualified Brick.Widgets.Core as B
 import Brick.Widgets.Core ((<+>))
+import qualified Brick.Widgets.Core as B
 import qualified Brick.Widgets.List as B
+import Brick.Widgets.ProgressBar
 import Control.Monad.IO.Class (MonadIO)
 import Data.Aeson (Result (..))
 import Data.Maybe (fromMaybe, isJust)
@@ -43,7 +45,8 @@ import Network.API.MAL.Types
 import Network.API.MAL.Types.Lens
 
 data ExplorerEvent
-  = UpdateList
+  = UpdateTick
+  | UpdateList
   | UpdateAnime (Int, Anime)
   deriving (Show)
 
@@ -55,6 +58,7 @@ data Explorer
         next_page :: Maybe Int,
         limit :: Int,
         event_c :: B.BChan ExplorerEvent,
+        ticks :: Int,
         dirty :: [Anime]
       }
 
@@ -76,6 +80,7 @@ initExplorer u l c = do
                 next_page = if np then Just l else Nothing,
                 limit = l,
                 event_c = c,
+                ticks = 0,
                 dirty = []
               }
     _ -> fail "please login first"
@@ -107,20 +112,43 @@ dirtyAttr = B.listAttr <> "dirty"
 explorerAttrMap :: [(A.AttrName, V.Attr)]
 explorerAttrMap =
   [ (dirtyAttr, V.withStyle (B.fg V.red) V.bold),
-    (selectedAttr, V.withStyle (B.fg V.cyan) V.bold)
+    (selectedAttr, V.withStyle (B.fg V.cyan) V.bold),
+    (progressCompleteAttr, V.withStyle (B.bg V.green) V.bold),
+    (progressIncompleteAttr, V.withStyle (B.bg V.red) V.bold)
   ]
+
+wshift :: Int -> Int -> String -> String
+wshift width n s = if ls < width then s else take width $ t ++ h
+  where
+    ls = 1 + length s
+    s' = s ++ " " ++ replicate (width - ls) ' '
+    (h, t) = Prelude.splitAt (n `mod` max width ls) s'
+
+titleMaxWidth :: Int
+titleMaxWidth = 50
+
+toEllipsis :: Int -> String -> String
+toEllipsis n s
+  | length s > n = take (n - 3) s <> "..."
+  | otherwise = s
 
 renderItem :: Explorer -> Bool -> Anime -> (String -> B.Widget ())
 renderItem e sel a s
-  | sel = B.withAttr selectedAttr (B.str $ "<" <> s <> ">")
+  | sel = B.withAttr selectedAttr (B.str $ "<" <> s' <> ">")
   | a `elem` e ^. _dirty = B.withAttr dirtyAttr (B.str s)
-  | otherwise = B.str s
+  | otherwise = B.str $ toEllipsis titleMaxWidth s
+  where
+    s' = wshift (titleMaxWidth - 2) (e ^. _ticks) s
 
 listDrawAnime :: Explorer -> Bool -> Anime -> B.Widget ()
 listDrawAnime e sel a =
-  let epsWatched = show (num_episodes_watched $ my_list_status a)
-      totalEps = maybe "?" show (num_episodes a)
-   in C.hCenter . renderItem e sel a $ T.unpack (title a) <> " [" <> epsWatched <> "/" <> totalEps <> "]"
+  let epsWatched = num_episodes_watched $ my_list_status a
+      epsWatched' = fromIntegral epsWatched
+      totalEps = num_episodes a
+      label = " [" <> show epsWatched <> "/" <> maybe "?" show totalEps <> "]"
+      progbar = B.hLimitPercent 50 $ progressBar (Just label) (epsWatched' / maybe epsWatched' fromIntegral totalEps)
+   in (B.hLimit titleMaxWidth . B.padRight B.Max) (renderItem e sel a (T.unpack (title a)))
+        <+> B.translateBy (B.Location {loc = (1, 0)}) progbar
 
 drawExplorer :: Explorer -> [B.Widget ()]
 drawExplorer e = [ui]
@@ -132,10 +160,8 @@ drawExplorer e = [ui]
       Just i -> B.str (show (i + 1))
     total = B.str . show . length $ l ^. B.listElementsL
     box =
-      B.borderWithLabel label
-        $ B.hLimit 100
-        $ B.vLimit 15
-        $ B.renderList (listDrawAnime e) True l
+      B.borderWithLabel label $
+        B.renderList (listDrawAnime e) True l
     ui =
       B.vBox
         [ C.hCenter box,

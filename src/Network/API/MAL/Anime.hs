@@ -1,3 +1,5 @@
+{-# LANGUAGE UndecidableInstances #-}
+
 module Network.API.MAL.Anime
   ( searchAnime,
     searchAnimeP,
@@ -13,12 +15,16 @@ import Control.Monad.IO.Class
 import Data.Aeson
 import Data.Aeson.Types
 import Data.HashMap.Strict (member)
-import qualified Data.Text as T
 import Data.Text (Text)
+import qualified Data.Text as T
 import Data.Text.Encoding (encodeUtf8)
+import Debug.Trace
 import Network.API.MAL.Constants
 import Network.API.MAL.Types
 import Network.HTTP.Req
+
+instance Show ReqBodyUrlEnc where
+  show _ = ""
 
 parseAnimeList :: Value -> Parser [Anime]
 parseAnimeList = withObject "AnimeList" (mapM (.: "node") <=< (parseJSONList <=< (.: "data")))

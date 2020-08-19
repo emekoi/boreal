@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.1.
+-- This file has been generated from package.yaml by hpack version 0.34.2.
 --
 -- see: https://github.com/sol/hpack
 
@@ -42,10 +42,11 @@ library
       aeson >=1.4.7.1
     , aeson-pretty >=0.8.8
     , base >=4.7 && <5
-    , brick >=0.54
+    , brick >=0.55
     , bytestring >=0.10.10
     , directory >=1.3.6.0
     , fmt >=0.6.1.2
+    , http-client >=0.6.4.1
     , microlens >=0.4.11.2
     , microlens-platform >=0.4.1
     , microlens-th >=0.4.3.5
@@ -53,7 +54,6 @@ library
     , req >=3.2.0
     , template-haskell >=2.15.0.0
     , text >=1.2.4.0
-    , text-manipulate >=0.2.0.1
     , time >=1.1.0
     , unordered-containers >=0.2.10.0
     , vector >=0.12.1.2
@@ -80,10 +80,11 @@ executable boreal
     , aeson-pretty >=0.8.8
     , base >=4.7 && <5
     , boreal
-    , brick >=0.54
+    , brick >=0.55
     , bytestring >=0.10.10
     , directory >=1.3.6.0
     , fmt >=0.6.1.2
+    , http-client >=0.6.4.1
     , microlens >=0.4.11.2
     , microlens-platform >=0.4.1
     , microlens-th >=0.4.3.5
@@ -91,7 +92,6 @@ executable boreal
     , req >=3.2.0
     , template-haskell >=2.15.0.0
     , text >=1.2.4.0
-    , text-manipulate >=0.2.0.1
     , time >=1.1.0
     , unordered-containers >=0.2.10.0
     , vector >=0.12.1.2
@@ -112,10 +112,11 @@ test-suite boreal-test
     , aeson-pretty >=0.8.8
     , base >=4.7 && <5
     , boreal
-    , brick >=0.54
+    , brick >=0.55
     , bytestring >=0.10.10
     , directory >=1.3.6.0
     , fmt >=0.6.1.2
+    , http-client >=0.6.4.1
     , microlens >=0.4.11.2
     , microlens-platform >=0.4.1
     , microlens-th >=0.4.3.5
@@ -123,7 +124,6 @@ test-suite boreal-test
     , req >=3.2.0
     , template-haskell >=2.15.0.0
     , text >=1.2.4.0
-    , text-manipulate >=0.2.0.1
     , time >=1.1.0
     , unordered-containers >=0.2.10.0
     , vector >=0.12.1.2

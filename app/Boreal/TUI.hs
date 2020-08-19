@@ -5,15 +5,15 @@ where
 
 import Boreal.TUI.Explorer as E
 import qualified Brick.AttrMap as A
-import Brick.BChan (newBChan, writeBChan)
+import Brick.BChan (newBChan, writeBChan, writeBChanNonBlocking)
 import qualified Brick.Main as M
-import qualified Brick.Types as T
 import Brick.Types (Widget)
+import qualified Brick.Types as T
 import Brick.Util (on)
 import qualified Brick.Widgets.Center as C
 import qualified Brick.Widgets.List as L
 import Control.Concurrent (forkIO, threadDelay)
-import Control.Monad (void)
+import Control.Monad (forever, void)
 import Control.Monad.IO.Class (liftIO)
 import Data.Aeson (Result (..))
 import Data.List (delete)
@@ -46,9 +46,9 @@ appEvent ex (T.VtyEvent e) =
       case E.animes ex ^. L.listSelectedL of
         Nothing -> M.continue ex
         Just i ->
-          (liftIO . writeBChan (E.event_c ex) . E.UpdateAnime $ (i, getAnime ex i)) >> M.continue ex
+          (liftIO . void . writeBChanNonBlocking (E.event_c ex) . E.UpdateAnime $ (i, getAnime ex i)) >> M.continue ex
     V.EvKey V.KEsc [] -> M.halt ex
-    ev -> L.handleListEvent ev (E.animes ex) >>= \x -> M.continue (ex & _animes .~ x)
+    ev -> L.handleListEvent ev (E.animes ex) >>= \x -> M.continue (ex & _animes .~ x & _ticks .~ 0)
   where
     addDirty e i =
       let anime = e ^. _animes . L.listElementsL ^?! ix i
@@ -58,6 +58,8 @@ appEvent e (T.AppEvent E.UpdateList) = do
   if isJust $ E.next_page e
     then M.continue =<< E.explorerGetNextPage e
     else M.continue e
+appEvent e (T.AppEvent E.UpdateTick) = do
+  M.continue $ e & _ticks +~ 1
 appEvent e@E.Explorer {..} (T.AppEvent (E.UpdateAnime (i, a))) = do
   a' <- MAL.updateAnime auth_token a $ a ^. _my_list_status
   case a' of
@@ -70,8 +72,8 @@ theMap :: A.AttrMap
 theMap =
   A.attrMap
     V.defAttr
-    $ [ (L.listAttr, V.white `on` V.blue),
-        (L.listSelectedAttr, V.blue `on` V.white)
+    $ [ (L.listAttr, V.white `on` V.black),
+        (L.listSelectedAttr, V.black `on` V.white)
       ]
       <> E.explorerAttrMap
 
@@ -95,9 +97,12 @@ tuiMain :: Text -> IO ()
 tuiMain u = do
   chan <- newBChan 10
   e <- E.initExplorer u 50 chan
-  void . forkIO $ while (isJust . E.next_page) e $ do
+  void . forkIO . while (isJust . E.next_page) e $ do
     writeBChan chan E.UpdateList
     threadDelay 500000
+  void . forkIO . forever $ do
+    writeBChan chan E.UpdateTick
+    threadDelay 100000
   let buildVty = V.mkVty V.defaultConfig
   initialVty <- buildVty
   void $ M.customMain initialVty buildVty (Just chan) theApp e

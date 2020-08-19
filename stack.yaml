@@ -17,7 +17,7 @@
 #
 # resolver: ./custom-snapshot.yaml
 # resolver: https://example.com/snapshots/2018-01-01.yaml
-resolver: lts-16.2
+resolver: lts-16.10
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -39,8 +39,15 @@ packages:
 # - git: https://github.com/commercialhaskell/stack.git
 #   commit: e7b331f14bcffb8367cd58fbfc8b40ec7642100a
 #
+
+# extra-deps:
+#   - git: https://github.com/jtdaugherty/brick.git
+#     commit: 3e1004929623af7fc19e9076ddc5975f484ac88b
+
+
 extra-deps:
-  - brick-0.54@sha256:a860e5cb67eaf5adbffeeb88006861303418e709e82feba5c9ae69d4c9a01432,15356
+  - brick-0.55@sha256:c7ccbb4c15f05e0c5f82402225a8cfd4cd9f5f923ad02f83ad9693bd3dd49455,15356
+  - vty-5.30@sha256:4af3938d7b9e6096e222bf52d0ea5d39873bc6fe19febd34106906306af13730,20857
 
 # Override default flag values for local packages and extra-deps
 # flags: {}
@@ -66,9 +73,6 @@ extra-deps:
 # Allow a newer minor version of GHC than the snapshot specifies
 # compiler-check: newer-minor
 
-# ghc-options:
-#   "$locals": -Wall -fno-warn-name-shadowing -Wcompat -Wincomplete-uni-patterns
-#   "$everything": -fllvm -split-sections -flate-specialise -fspecialise-aggressively -O2 
-
 ghc-options:
   "$locals": -Wall -fno-warn-name-shadowing -Wcompat -Wincomplete-uni-patterns
+  "$everything": -split-sections -flate-specialise -fspecialise-aggressively # -O2 
